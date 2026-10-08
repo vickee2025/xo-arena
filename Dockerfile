@@ -20,7 +20,7 @@ WORKDIR /app
 RUN addgroup -S appgroup && adduser -S appuser -G appgroup
 USER appuser
 
-COPY --from=builder /build/target/xo-arena-1.0.0.jar app.jar
+COPY --from=builder --chown=appuser:appgroup /build/target/xo-arena-1.0.0.jar app.jar
 
 EXPOSE 8080
 
