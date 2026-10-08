@@ -198,25 +198,47 @@ docker rm xo-arena-app
 
 Now, connect your code to an automated CI/CD pipeline on your **AWS EC2 Ubuntu Server** created on Day 3.
 
-### Step 3.1: Fork this Repository
-1. In GitHub, click the **Fork** button at the top-right of this repository (`https://github.com/vickee2025/xo-arena`).
-2. Select your personal GitHub username as the destination.
-3. You now have your own repository: `https://github.com/<YOUR_USERNAME>/xo-arena`.
+### Step 3.1: Create Your Personal Copy from Template (or Fork)
+1. At the top of this repository (`https://github.com/vickee2025/xo-arena`), click the green button: **"Use this template"** → **"Create a new repository"** (or click **"Fork"**).
+2. **Can you name it anything you want? YES!** You can name it `xo-arena`, `my-xo-app`, `devops-game`, etc.
+3. Select your personal GitHub username as destination and make it **Public**.
+4. You now have your own independent repository: `https://github.com/<YOUR_USERNAME>/<YOUR_REPO_NAME>`.
+
+> 💡 **Do you need to edit the `Jenkinsfile`? NO!**  
+> The `Jenkinsfile` uses standardized internal container tags (`xo-arena-production`) and automatically clones your specific repository via `checkout scm`. It works 100% out-of-the-box with **zero edits needed**!
 
 ### Step 3.2: Verify Server Prerequisites on AWS EC2
-SSH into your Day 3 EC2 instance:
+SSH into your Day 3 EC2 instance (from Windows PowerShell, Mac Terminal, or Git Bash):
 ```bash
 ssh -i your-key.pem ubuntu@<EC2_PUBLIC_IP>
 ```
-Verify that Docker and Jenkins are active:
+
+#### A. Remove Day 3 Native Nginx Service:
+On Day 3, we installed native Nginx. Stop and disable it so it does not conflict with Docker:
 ```bash
-docker --version
-sudo systemctl status jenkins
+sudo systemctl stop nginx 2>/dev/null || true
+sudo systemctl disable nginx 2>/dev/null || true
+sudo apt-get remove -y nginx 2>/dev/null || true
+sudo lsof -i :80 ; sudo lsof -i :8080
 ```
-Ensure the `jenkins` user has permission to control Docker:
+
+#### B. Configure 2GB Swap Memory (Mandatory for `t3.micro` 1GB RAM instances):
 ```bash
-sudo usermod -aG docker jenkins
-sudo systemctl restart jenkins
+sudo fallocate -l 2G /swapfile
+sudo chmod 600 /swapfile
+sudo mkswap /swapfile
+sudo swapon /swapfile
+echo '/swapfile none swap sw 0 0' | sudo tee -a /etc/fstab
+free -h
+```
+
+#### C. Verify Docker & Grant Jenkins Permissions:
+```bash
+sudo apt-get update && sudo apt-get install -y docker.io
+sudo systemctl enable --now docker
+sudo usermod -aG docker ubuntu
+sudo usermod -aG docker jenkins 2>/dev/null || true
+sudo systemctl restart jenkins 2>/dev/null || true
 ```
 
 ### Step 3.3: Create Pipeline Job in Jenkins
