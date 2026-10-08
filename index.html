@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>XO Arena · Cloud & DevOps Edition</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="stars-bg"></div>
+  <div class="game-container">
+    <header class="header">
+      <div class="badge-env">AWS EC2 · Dockerized Container</div>
+      <h1>XO ARENA</h1>
+      <p class="subtitle">Cloud &amp; DevOps Engineering Edition · CKCET</p>
+    </header>
+
+    <div class="scoreboard">
+      <div class="score-card player-x active" id="card-x">
+        <div class="player-avatar">✕</div>
+        <div class="player-info">
+          <span class="player-name">Player X</span>
+          <span class="player-role">DevOps Dev</span>
+        </div>
+        <div class="score-val" id="score-x">0</div>
+      </div>
+
+      <div class="score-card ties" id="card-ties">
+        <div class="player-avatar">⚡</div>
+        <div class="player-info">
+          <span class="player-name">Draws</span>
+          <span class="player-role">Deadlock</span>
+        </div>
+        <div class="score-val" id="score-ties">0</div>
+      </div>
+
+      <div class="score-card player-o" id="card-o">
+        <div class="player-avatar">◯</div>
+        <div class="player-info">
+          <span class="player-name">Player O</span>
+          <span class="player-role">Site Reliability</span>
+        </div>
+        <div class="score-val" id="score-o">0</div>
+      </div>
+    </div>
+
+    <div class="status-banner" id="status-banner">
+      Turn: <span class="highlight-turn" id="turn-indicator">Player X (✕)</span>
+    </div>
+
+    <div class="board" id="board" role="grid" aria-label="Tic Tac Toe Board">
+      <button class="cell" data-cell="0" aria-label="Cell 1"></button>
+      <button class="cell" data-cell="1" aria-label="Cell 2"></button>
+      <button class="cell" data-cell="2" aria-label="Cell 3"></button>
+      <button class="cell" data-cell="3" aria-label="Cell 4"></button>
+      <button class="cell" data-cell="4" aria-label="Cell 5"></button>
+      <button class="cell" data-cell="5" aria-label="Cell 6"></button>
+      <button class="cell" data-cell="6" aria-label="Cell 7"></button>
+      <button class="cell" data-cell="7" aria-label="Cell 8"></button>
+      <button class="cell" data-cell="8" aria-label="Cell 9"></button>
+    </div>
+
+    <div class="controls">
+      <button class="btn btn-primary" id="btn-restart">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/>
+          <path d="M3 3v5h5"/>
+        </svg>
+        Restart Round
+      </button>
+      <button class="btn btn-secondary" id="btn-reset-scores">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+        </svg>
+        Reset Scores
+      </button>
+    </div>
+
+    <footer class="footer">
+      <div class="build-info">
+        <span>Container Runtime: <b>Docker Alpine Nginx</b></span>
+        <span>CI/CD Engine: <b>Jenkins Declarative Pipeline</b></span>
+      </div>
+      <p class="copyright">Deployed with ❤️ by CKCET 2026 DevOps Cohort</p>
+    </footer>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>

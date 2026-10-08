@@ -1,0 +1,17 @@
+# Operating System Files
+.DS_Store
+Thumbs.db
+
+# Editor & IDE Directories
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Logs & Diagnostics
+*.log
+npm-debug.log*
+
+# Environment files
+.env
+.env.local

@@ -1,0 +1,6 @@
+.git
+.gitignore
+Jenkinsfile
+README.md
+*.log
+.DS_Store
