@@ -1,28 +1,30 @@
 # ========================================================
-# XO Arena — Lightweight Production Dockerfile
-# Base: Nginx Alpine (Ultra-lean ~23MB footprint)
-# Serves static web assets on Port 80
+# XO Arena — Multi-Stage Production Dockerfile
+# Stage 1: Build fat JAR with Maven & Java 17
+# Stage 2: Minimal Alpine JRE runtime with non-root security
 # ========================================================
 
-FROM nginx:1.27-alpine
+# Stage 1: Build
+FROM maven:3.9-eclipse-temurin-17-alpine AS builder
+WORKDIR /build
 
-LABEL maintainer="CKCET Cloud & DevOps Cohort <devops@ckcet.edu.in>"
-LABEL description="Interactive XO Arena containerized web application"
+COPY pom.xml .
+COPY src ./src
 
-# Remove default nginx welcome page
-RUN rm -rf /usr/share/nginx/html/*
+RUN mvn clean package -DskipTests -B
 
-# Copy static application assets into Nginx web root
-COPY index.html /usr/share/nginx/html/
-COPY style.css /usr/share/nginx/html/
-COPY app.js /usr/share/nginx/html/
+# Stage 2: Runtime
+FROM eclipse-temurin:17-jre-alpine
+WORKDIR /app
 
-# Expose HTTP container port
-EXPOSE 80
+RUN addgroup -S appgroup && adduser -S appuser -G appgroup
+USER appuser
 
-# Health check to ensure Nginx is responding to requests
+COPY --from=builder /build/target/xo-arena-1.0.0.jar app.jar
+
+EXPOSE 8080
+
 HEALTHCHECK --interval=30s --timeout=3s --retries=3 \
-  CMD wget --quiet --tries=1 --spider http://localhost/ || exit 1
+  CMD wget --quiet --tries=1 --spider http://localhost:8080/api/health || exit 1
 
-# Launch Nginx in foreground to keep container running
-CMD ["nginx", "-g", "daemon off;"]
+ENTRYPOINT ["java", "-jar", "app.jar"]

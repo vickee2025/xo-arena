@@ -8,6 +8,10 @@ Thumbs.db
 *.swp
 *.swo
 
+# Build & Dependency Directories
+target/
+dependency-reduced-pom.xml
+
 # Logs & Diagnostics
 *.log
 npm-debug.log*

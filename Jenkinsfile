@@ -6,7 +6,7 @@ pipeline {
         IMAGE_NAME      = 'xo-arena'
         CONTAINER_NAME  = 'xo-arena-production'
         HOST_PORT       = '8080'
-        CONTAINER_PORT  = '80'
+        CONTAINER_PORT  = '8080'
     }
 
     stages {
@@ -21,18 +21,20 @@ pipeline {
             steps {
                 echo "Validating core application assets and Dockerfile presence..."
                 sh '''
-                    test -f index.html || { echo "ERROR: index.html missing"; exit 1; }
-                    test -f style.css || { echo "ERROR: style.css missing"; exit 1; }
-                    test -f app.js || { echo "ERROR: app.js missing"; exit 1; }
+                    test -f pom.xml || { echo "ERROR: pom.xml missing"; exit 1; }
+                    test -f src/main/java/com/ckcet/devops/App.java || { echo "ERROR: App.java missing"; exit 1; }
+                    test -f src/main/resources/public/index.html || { echo "ERROR: index.html missing"; exit 1; }
+                    test -f src/main/resources/public/style.css || { echo "ERROR: style.css missing"; exit 1; }
+                    test -f src/main/resources/public/app.js || { echo "ERROR: app.js missing"; exit 1; }
                     test -f Dockerfile || { echo "ERROR: Dockerfile missing"; exit 1; }
-                    echo "Static asset integrity check passed."
+                    echo "Static asset and project integrity check passed."
                 '''
             }
         }
 
         stage('3. Build Docker Image') {
             steps {
-                echo "Building lightweight Docker container image..."
+                echo "Building multi-stage Docker container image..."
                 sh """
                     docker build \
                         --label "build_number=${BUILD_NUMBER}" \
@@ -63,11 +65,11 @@ pipeline {
 
         stage('5. Automated Smoke Test & Health Check') {
             steps {
-                echo "Running curl smoke test against deployed container on Port ${HOST_PORT}..."
+                echo "Running curl health check against deployed container on Port ${HOST_PORT}..."
                 sh """
                     sleep 3
-                    curl -s -f http://127.0.0.1:${HOST_PORT}/ > /dev/null || {
-                        echo "ERROR: Health check failed! App not responding on http://127.0.0.1:${HOST_PORT}/"
+                    curl -s -f http://127.0.0.1:${HOST_PORT}/api/health > /dev/null || {
+                        echo "ERROR: Health check failed! App not responding on http://127.0.0.1:${HOST_PORT}/api/health"
                         docker logs ${CONTAINER_NAME}
                         exit 1
                     }
@@ -85,6 +87,7 @@ pipeline {
             echo "=========================================================="
             echo "🚀 DEPLOYMENT SUCCESSFUL!"
             echo "Application is live at: http://<YOUR_EC2_PUBLIC_IP>:${HOST_PORT}"
+            echo "Health endpoint: http://<YOUR_EC2_PUBLIC_IP>:${HOST_PORT}/api/health"
             echo "=========================================================="
         }
         failure {
